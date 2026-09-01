@@ -20,6 +20,24 @@ async function distressMap(req, res, next) {
   } catch (error) { return next(error); }
 }
 
+async function seasonReplay(req, res, next) {
+  try {
+    return res.json({
+      district: req.query.district || 'Cuttack',
+      weeks: [
+        { week: 'W1', drought: 28, price: 12, distress: 22 },
+        { week: 'W2', drought: 34, price: 18, distress: 31 },
+        { week: 'W3', drought: 48, price: 21, distress: 43 },
+        { week: 'W4', drought: 55, price: 23, distress: 49 },
+        { week: 'W5', drought: 61, price: 30, distress: 58 },
+        { week: 'W6', drought: 46, price: 27, distress: 51 },
+        { week: 'W7', drought: 38, price: 19, distress: 39 },
+      ],
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (error) { return next(error); }
+}
+
 async function alerts(req, res, next) {
   try {
     const { value, error } = listSchema.validate(req.query);
@@ -59,4 +77,4 @@ async function updateAlertStatus(req, res, next) {
   } catch (error) { return next(error); }
 }
 
-module.exports = { distressMap, alerts, updateAlertStatus };
+module.exports = { distressMap, alerts, seasonReplay, updateAlertStatus };

@@ -13,7 +13,9 @@ async function sendOtp(req, res, next) {
     const otp = await issueOtp(value.phone, req.ip);
     let delivery;
     try { delivery = await sendSms(value.phone, otp); } catch (smsError) { await revokeOtp(value.phone); throw smsError; }
-    return res.status(202).json({ message: 'OTP sent successfully', delivery: delivery.provider });
+    const payload = { message: 'OTP sent successfully', delivery: delivery.provider };
+    if (process.env.NODE_ENV !== 'production' && delivery.provider === 'sandbox') payload.sandboxOtp = otp;
+    return res.status(202).json(payload);
   } catch (error) { return next(error); }
 }
 

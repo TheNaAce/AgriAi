@@ -67,6 +67,14 @@ function normalizeHourly(hourly) {
 
 function average(values) { return values.reduce((sum, value) => sum + value, 0) / values.length; }
 
+function firstForecastDate(hours) {
+  const raw = hours[0]?.time;
+  const parsed = typeof raw === 'string' && !/[zZ]|[+-]\d{2}:\d{2}$/.test(raw)
+    ? new Date(`${raw}Z`)
+    : new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
 async function getHistoricalRainfallBaseline(lat, lng, currentDate = new Date()) {
   const startYear = currentDate.getUTCFullYear() - 10;
   const endYear = currentDate.getUTCFullYear() - 1;
@@ -125,7 +133,7 @@ async function getWeatherAndSoilData(lat, lng) {
 
     let baseline;
     try {
-      baseline = await getHistoricalRainfallBaseline(lat, lng);
+      baseline = await getHistoricalRainfallBaseline(lat, lng, firstForecastDate(next7));
     } catch (error) {
       // Forecast remains useful if the historical endpoint is temporarily unavailable.
       baseline = { precipitation7dBaselineMm: Number(process.env.HISTORICAL_DAILY_RAINFALL_MM || 4) * 7, years: 0, source: 'configured-fallback' };
